@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Context Menu Creator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <div class="header">
+            <h1>⚙ Context Menu Creator</h1>
+            <p>Manage Windows Explorer right-click menu entries</p>
+            <div class="header-badges">
+                <div id="adminBadge" class="badge warn">⏳ Checking…</div>
+            </div>
+        </div>
+
+        <!-- Win11 Toggle -->
+        <div class="win11-bar">
+            <div class="info">
+                <strong>Windows 11 Classic Menu</strong>
+                <span>Force full context menu on right-click (no "Show more options")</span>
+            </div>
+            <button id="win11Toggle" class="toggle-switch" onclick="toggleWin11()"></button>
+        </div>
+
+        <!-- Two-column layout -->
+        <div class="app-layout">
+            <!-- Left: Main Content -->
+            <div class="main-col">
+                <!-- Search & Filters -->
+                <div class="control-bar">
+                    <div class="search-box">
+                        <span class="icon">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search entries…" oninput="renderFiltered()">
+                    </div>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all" onclick="setFilter(this)">All</button>
+                        <button class="filter-tab" data-filter="all_files" onclick="setFilter(this)">Files *</button>
+                        <button class="filter-tab" data-filter="directory" onclick="setFilter(this)">Dir</button>
+                        <button class="filter-tab" data-filter="dir_background" onclick="setFilter(this)">DirBG</button>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <h2 id="entryCount">Loading…</h2>
+                    <div class="toolbar-actions">
+                        <button class="btn btn-ghost btn-sm" onclick="loadEntries()">↻ Refresh</button>
+                        <button class="btn btn-primary" onclick="openAddModal()">+ Add Entry</button>
+                    </div>
+                </div>
+
+                <!-- Entries -->
+                <div id="entriesContainer">
+                    <div class="entries-list">
+                        <div class="skeleton"></div>
+                        <div class="skeleton"></div>
+                        <div class="skeleton"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Log Sidebar -->
+            <div class="log-sidebar" id="logPanel">
+                <div class="log-sidebar-header">
+                    <h3><span class="live-dot"></span> Log <span id="logTotal"
+                            style="font-weight:400;color:var(--text-muted);font-size:0.6rem"></span></h3>
+                    <div class="log-actions">
+                        <button class="btn btn-ghost btn-sm" onclick="openBackupBrowser()" id="backupsBtn"
+                            title="View backups" style="display:none">📦</button>
+                        <button class="btn btn-danger btn-sm" onclick="clearLogs()" title="Clear & backup">🗑</button>
+                    </div>
+                </div>
+                <div class="log-sidebar-body" id="logLines">
+                    <div class="empty">No logs loaded</div>
+                </div>
+                <div class="log-sidebar-footer">
+                    <span id="logInfo">Live</span>
+                    <span id="logBackupInfo"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toasts" class="toast-container"></div>
+
+    <!-- Add/Edit Modal -->
+    <div id="entryModal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <h3 id="modalTitle">Add New Entry</h3>
+            <input type="hidden" id="editingKey" value="">
+
+            <div class="form-group">
+                <label>Executable Path</label>
+                <div class="input-row">
+                    <input type="text" id="exePath" placeholder="C:\Program Files\App\app.exe">
+                    <button class="btn btn-ghost btn-sm" onclick="pickFile()">📂</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Registry Key Name</label>
+                <input type="text" id="keyName" placeholder="AppName (no spaces)">
+            </div>
+            <div class="form-group">
+                <label>Display Label</label>
+                <input type="text" id="displayName" placeholder="Open with App Name">
+            </div>
+            <div class="form-group">
+                <label>Icon Path</label>
+                <input type="text" id="iconPath" placeholder="Auto-detected from exe">
+            </div>
+            <div class="form-group">
+                <label>Target Scopes</label>
+                <div class="scope-checkboxes">
+                    <div class="scope-option" data-scope="all_files" onclick="toggleScope(this)">
+                        <div class="check"></div><span>All Files (*)</span>
+                    </div>
+                    <div class="scope-option" data-scope="directory" onclick="toggleScope(this)">
+                        <div class="check"></div><span>Directories</span>
+                    </div>
+                    <div class="scope-option" data-scope="dir_background" onclick="toggleScope(this)">
+                        <div class="check"></div><span>Dir Background</span>
+                    </div>
+                    <div class="scope-option" data-scope="extension" onclick="toggleScope(this)">
+                        <div class="check"></div><span>Extensions</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" id="extensionsGroup" style="display:none;">
+                <label>File Extensions</label>
+                <div class="ext-picker" id="extPicker"></div>
+                <div class="ext-manual">
+                    <input type="text" id="extManualInput" placeholder="Custom: .xyz, .abc">
+                    <button class="btn btn-ghost btn-sm" onclick="addManualExts()">+ Add</button>
+                </div>
+                <div class="ext-selected-summary" id="extSummary"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" id="modalSubmit" onclick="submitEntry()">Add Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete -->
+    <div id="confirmModal" class="modal-overlay" onclick="if(event.target===this)closeConfirm()">
+        <div class="modal" style="max-width:400px">
+            <h3>Confirm Removal</h3>
+            <div class="confirm-body">Remove <strong id="confirmName"></strong> from all scopes?<br>This cannot be
+                undone.</div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmRemove()">Remove</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Browser Modal -->
+    <div id="backupModal" class="modal-overlay" onclick="if(event.target===this)closeBackupBrowser()">
+        <div class="modal" style="max-width:500px">
+            <h3>📦 Log Backups</h3>
+            <div class="backup-list" id="backupList">
+                <div class="backup-empty">Loading…</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeBackupBrowser()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Modules (order matters: utils first, then features) -->
+    <script src="js/app.js"></script>
+    <script src="js/extensions.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/logs.js"></script>
+</body>
+
+</html>
