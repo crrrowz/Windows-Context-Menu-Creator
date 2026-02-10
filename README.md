@@ -180,6 +180,12 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ---
 
+## 🗺️ Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for the planned evolution into a standalone `.exe` desktop app.
+
+---
+
 ## 📝 Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
