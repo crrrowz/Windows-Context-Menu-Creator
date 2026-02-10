@@ -57,7 +57,7 @@ class MenuEntry:
     def build_command(self, placeholder: str = "%1") -> str:
         """Render the final command string for the registry."""
         return self.command_template.format(
-            exe_path=self.exe_path,
+            exe_path=self.exe_path.replace("/", "\\"),
             target=placeholder,
         )
 
@@ -67,6 +67,10 @@ class MenuEntry:
                 f"MenuEntry '{self.key_name}': TargetScope.EXTENSION requires "
                 f"a non-empty `extensions` list."
             )
+        # Normalize paths: forward → backslashes (Windows Registry requirement)
+        self.exe_path = self.exe_path.replace("/", "\\")
+        if self.icon:
+            self.icon = self.icon.replace("/", "\\")
         # Normalize extensions to include leading dot
         self.extensions = [
             ext if ext.startswith(".") else f".{ext}"
