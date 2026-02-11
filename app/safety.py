@@ -6,7 +6,7 @@ import ctypes
 import os
 from pathlib import Path
 
-from logger_setup import get_logger
+from app.logger_setup import get_logger
 
 log = get_logger("safety")
 

@@ -3,7 +3,7 @@ Pre-built MenuEntry presets for common applications.
 Import and use directly, or use as templates for custom entries.
 """
 
-from config import MenuEntry, TargetScope
+from app.config import MenuEntry, TargetScope
 
 # ── Sublime Text ────────────────────────────────────────────────
 SUBLIME_FILES = MenuEntry(

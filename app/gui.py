@@ -15,6 +15,40 @@ import threading
 import urllib.request
 
 _URL = "http://127.0.0.1:8787"
+_MUTEX_NAME = "Global\\ContextMenuCreator_SingleInstance"
+_mutex_handle = None
+
+
+def _acquire_single_instance_lock() -> bool:
+    """Try to acquire a system-wide mutex. Returns True if this is the only instance."""
+    global _mutex_handle
+    try:
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        ERROR_ALREADY_EXISTS = 183
+
+        _mutex_handle = kernel32.CreateMutexW(None, False, _MUTEX_NAME)
+        if kernel32.GetLastError() == ERROR_ALREADY_EXISTS:
+            kernel32.CloseHandle(_mutex_handle)
+            _mutex_handle = None
+            return False
+        return True
+    except Exception:
+        return True  # If mutex fails, allow launch anyway
+
+
+def _focus_existing_window():
+    """Try to bring the existing instance's window to the foreground."""
+    try:
+        import ctypes
+        user32 = ctypes.windll.user32
+        hwnd = user32.FindWindowW(None, "Context Menu Creator")
+        if hwnd:
+            SW_RESTORE = 9
+            user32.ShowWindow(hwnd, SW_RESTORE)
+            user32.SetForegroundWindow(hwnd)
+    except Exception:
+        pass
 
 # Crash log in the centralized app data folder
 _CRASH_DIR = os.path.join(os.environ.get("TEMP", r"C:\temp"), "ContextMenuCreator")
@@ -46,7 +80,7 @@ def _wait_for_server(url: str, timeout: float = 10.0) -> bool:
 def _run_server() -> None:
     """Wrapper around start_server that catches and logs crashes."""
     try:
-        from server import start_server
+        from app.server import start_server
         start_server()
     except Exception:
         _log_crash("SERVER CRASH:\n" + traceback.format_exc())
@@ -55,7 +89,12 @@ def _run_server() -> None:
 def launch() -> None:
     """Show window instantly with loading page, then navigate once server is ready."""
     try:
-        from safety import is_admin
+        # Single-instance guard
+        if not _acquire_single_instance_lock():
+            _focus_existing_window()
+            sys.exit(0)
+
+        from app.safety import is_admin
         if not is_admin():
             _log_crash("WARNING: Not running as Administrator")
 
@@ -66,7 +105,7 @@ def launch() -> None:
         if getattr(sys, 'frozen', False):
             _base = Path(sys._MEIPASS) / 'static'
         else:
-            _base = Path(__file__).parent / 'static'
+            _base = Path(__file__).parent.parent / 'static'
         loading_url = (_base / 'loading.html').as_uri()
         icon_path = str(_base / 'icon.ico')
 

@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.0.0] — 2026-02-11
+
+### Added
+
+- **Native desktop app** — Standalone `.exe` window via pywebview with custom frameless titlebar (minimize, maximize, close).
+- **Single-instance enforcement** — Windows named mutex prevents duplicate launches; focuses existing window instead.
+- **Internationalization (i18n)** — Full Arabic and English support with dynamic language switching.
+- **RTL layout** — Complete right-to-left support for Arabic, including CSS logical properties throughout.
+- **Dark / Light themes** — Theme toggle with persistence via localStorage.
+- **SVG icon system** — All UI icons replaced with inline SVG (no emoji dependencies).
+- **Loading splash screen** — Instant `loading.html` shown while the server boots, eliminating blank-window delay.
+- **Titlebar menu bar** — File, View, and Help dropdown menus in the custom titlebar.
+- **Extension summary chips** — Selected extensions shown as removable chips with custom extension support.
+
+### Changed
+
+- **Project structure** — Python modules moved into `app/` package; documentation moved to `docs/`.
+- **Build entry point** — PyInstaller now bundles from `main.py` with `app/` as a package.
+- **Taskbar icon** — Set at runtime via Win32 API (`LoadImageW` + `SendMessageW`).
+
+### Fixed
+
+- RTL dropdown menus no longer clip off-screen.
+- Filter tabs no longer double-reverse in RTL mode.
+- Search box icon and padding use CSS logical properties for correct RTL alignment.
+
+---
+
 ## [1.0.0] — 2026-02-10
 
 ### Added

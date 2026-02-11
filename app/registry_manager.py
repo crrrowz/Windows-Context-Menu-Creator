@@ -10,9 +10,9 @@ from __future__ import annotations
 import winreg
 from typing import Optional
 
-from config import MenuEntry, TargetScope
-from safety import require_admin, validate_exe_path, validate_icon_path
-from logger_setup import get_logger
+from app.config import MenuEntry, TargetScope
+from app.safety import require_admin, validate_exe_path, validate_icon_path
+from app.logger_setup import get_logger
 
 log = get_logger("registry")
 

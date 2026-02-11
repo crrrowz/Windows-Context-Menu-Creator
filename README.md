@@ -10,7 +10,10 @@ A powerful, GUI-based tool for managing Windows Explorer right-click context men
 
 ## ✨ Features
 
+- **Desktop app** — Native window via pywebview (no browser needed), with custom frameless titlebar
 - **Web-based GUI** — Modern, dark-themed interface served at `localhost:8787`
+- **Multi-language** — English and Arabic with full RTL support
+- **Dark / Light themes** — Toggle between themes, persisted in localStorage
 - **Multi-scope registration** — Target `All Files (*)`, `Directories`, `Directory Background`, or specific file extensions
 - **Extension picker** — Visual category-based picker with 80+ common file extensions
 - **Windows 11 support** — One-click toggle to force the classic context menu (bypasses "Show more options")
@@ -64,6 +67,14 @@ Launches a live interactive terminal with a menu to **add**, **remove**, **edit*
 python main.py --gui
 ```
 
+Opens the app as a native desktop window (pywebview). No browser required.
+
+#### Web GUI (browser fallback)
+
+```bash
+python main.py --browser
+```
+
 Opens your default browser to `http://localhost:8787` with the full visual interface.
 
 #### Dry Run
@@ -80,37 +91,49 @@ Logs every registry operation without actually writing. Useful for previewing ch
 
 ```
 Windows-Context-Menu-Creator/
-├── main.py               # CLI entry point + --gui launcher
-├── server.py             # HTTP API server (serves GUI + REST endpoints)
-├── registry_manager.py   # All Windows Registry (winreg) operations
-├── config.py             # Data models: MenuEntry, TargetScope
-├── safety.py             # Admin check, exe/icon path validation
-├── logger_setup.py       # Centralized logging configuration
-├── examples.py           # Pre-built entry templates
-├── logs/
-│   ├── context_menu.log  # Current session log
-│   └── backups/          # Timestamped log backups
-└── static/
-    ├── index.html        # Main HTML shell
-    ├── css/
-    │   └── styles.css    # Full design system
-    └── js/
-        ├── app.js        # Init, status, entries, filtering, rendering
-        ├── extensions.js # Extension picker logic
-        ├── modal.js      # Add/Edit/Delete modals + form handling
-        └── logs.js       # Live log polling + backup browser
+├── main.py                   # CLI entry point + --gui / --browser launcher
+├── build.spec                # PyInstaller build configuration
+├── requirements.txt          # Runtime dependencies (pywebview)
+├── app/                      # Core Python package
+│   ├── __init__.py
+│   ├── gui.py                # Desktop launcher (pywebview + single-instance)
+│   ├── server.py             # HTTP API server (REST + static file serving)
+│   ├── registry_manager.py   # All Windows Registry (winreg) operations
+│   ├── config.py             # Data models: MenuEntry, TargetScope
+│   ├── safety.py             # Admin check, exe/icon path validation
+│   ├── logger_setup.py       # Centralized logging configuration
+│   └── examples.py           # Pre-built entry templates
+├── static/
+│   ├── index.html            # Main HTML shell (custom frameless titlebar)
+│   ├── loading.html          # Instant loading splash page
+│   ├── icon.ico              # Application icon
+│   ├── css/
+│   │   └── styles.css        # Full design system (dark/light, LTR/RTL)
+│   ├── js/
+│   │   ├── app.js            # Init, status, entries, filtering, rendering
+│   │   ├── i18n.js           # Language & theme engine, SVG icon library
+│   │   ├── extensions.js     # Extension picker (categories, chips, custom)
+│   │   ├── modal.js          # Add/Edit/Delete modals + form handling
+│   │   ├── menubar.js        # Titlebar menu dropdowns
+│   │   └── logs.js           # Live log polling + backup browser
+│   └── lang/
+│       ├── en.json           # English translations (LTR)
+│       └── ar.json           # Arabic translations (RTL)
+└── docs/
+    └── PYTHON_TO_WINDOWS_APP.md  # Conversion guide
 ```
 
 ### Module Responsibilities
 
 | Module | Role |
 |---|---|
-| `config.py` | Pure data layer — `MenuEntry` dataclass and `TargetScope` enum. Zero side-effects. |
-| `safety.py` | Pre-flight checks: admin privileges, exe path validation, icon path validation. |
-| `registry_manager.py` | The **only** module that touches `winreg`. All read/write/delete operations. |
-| `server.py` | HTTP API bridge between the web GUI and `RegistryManager`. Serves static files. |
-| `main.py` | CLI interface with interactive prompts. Launches GUI with `--gui` flag. |
-| `logger_setup.py` | Configures file + console logging with rotation. |
+| `app/config.py` | Pure data layer — `MenuEntry` dataclass and `TargetScope` enum. Zero side-effects. |
+| `app/safety.py` | Pre-flight checks: admin privileges, exe path validation, icon path validation. |
+| `app/registry_manager.py` | The **only** module that touches `winreg`. All read/write/delete operations. |
+| `app/server.py` | HTTP API bridge between the web GUI and `RegistryManager`. Serves static files. |
+| `app/gui.py` | Desktop shell — pywebview launcher, single-instance mutex, taskbar icon. |
+| `app/logger_setup.py` | Configures file + console logging under `%TEMP%\ContextMenuCreator\logs`. |
+| `main.py` | CLI entry point. `--gui` for desktop, `--browser` for browser, plain for CLI. |
 
 ---
 

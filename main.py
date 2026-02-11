@@ -12,10 +12,10 @@ from __future__ import annotations
 
 import sys
 
-from config import MenuEntry, TargetScope
-from registry_manager import RegistryManager
-from safety import require_admin
-from logger_setup import get_logger
+from app.config import MenuEntry, TargetScope
+from app.registry_manager import RegistryManager
+from app.safety import require_admin
+from app.logger_setup import get_logger
 
 log = get_logger("main")
 
@@ -410,10 +410,10 @@ def main() -> None:
 
 if __name__ == "__main__":
     if "--gui" in sys.argv:
-        from gui import launch
+        from app.gui import launch
         launch()
     elif "--browser" in sys.argv:
-        from server import start_gui
+        from app.server import start_gui
         start_gui()
     else:
         main()

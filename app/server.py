@@ -23,10 +23,10 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 
-from config import MenuEntry, TargetScope
-from registry_manager import RegistryManager
-from safety import is_admin
-from logger_setup import get_logger
+from app.config import MenuEntry, TargetScope
+from app.registry_manager import RegistryManager
+from app.safety import is_admin
+from app.logger_setup import get_logger
 
 log = get_logger("server")
 
@@ -34,7 +34,7 @@ log = get_logger("server")
 if getattr(sys, 'frozen', False):
     _BASE_DIR = Path(sys._MEIPASS)  # PyInstaller temp folder (static assets)
 else:
-    _BASE_DIR = Path(__file__).parent
+    _BASE_DIR = Path(__file__).parent.parent  # project root (app/ → root)
 
 # Logs/crash in a fixed user-accessible location
 _APP_DIR = Path(os.environ.get("TEMP", r"C:\temp")) / "ContextMenuCreator"

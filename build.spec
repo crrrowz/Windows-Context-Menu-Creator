@@ -15,21 +15,22 @@ import sys
 block_cipher = None
 
 a = Analysis(
-    ['gui.py'],
-    pathex=[],
+    ['main.py'],
+    pathex=['.'],
     binaries=[],
     datas=[
         ('static', 'static'),
-        ('logs', 'logs'),
+        ('app', 'app'),
     ],
     hiddenimports=[
         'webview',
-        'config',
-        'registry_manager',
-        'safety',
-        'logger_setup',
-        'server',
-        'examples',
+        'app.config',
+        'app.registry_manager',
+        'app.safety',
+        'app.logger_setup',
+        'app.server',
+        'app.gui',
+        'app.examples',
     ],
     hookspath=[],
     hooksconfig={},
@@ -63,6 +64,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    uac_admin=False,          # Don't auto-elevate; user runs as admin when needed
+    uac_admin=True,
     icon='static/icon.ico',
 )
