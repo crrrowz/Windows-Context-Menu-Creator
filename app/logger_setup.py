@@ -34,13 +34,23 @@ def _init_root_logger() -> None:
         datefmt="%Y-%m-%d %H:%M:%S",
     ))
 
-    # ── Console handler (compact) ───────────────────────────────
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(logging.INFO)
-    ch.setFormatter(logging.Formatter("%(levelname)-8s │ %(message)s"))
-
     root.addHandler(fh)
-    root.addHandler(ch)
+
+    # ── Console handler (compact) ───────────────────────────────
+    # Skip console output in frozen windowed apps (no stdout)
+    if not (getattr(sys, 'frozen', False) and sys.stdout is None):
+        import io
+        try:
+            stream = io.TextIOWrapper(
+                sys.stdout.buffer, encoding="utf-8", errors="replace"
+            )
+        except AttributeError:
+            stream = sys.stdout
+        ch = logging.StreamHandler(stream)
+        ch.setLevel(logging.INFO)
+        ch.setFormatter(logging.Formatter("%(levelname)-8s | %(message)s"))
+        root.addHandler(ch)
+
     _INITIALIZED = True
 
 
