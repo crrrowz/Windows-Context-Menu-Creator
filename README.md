@@ -28,7 +28,35 @@ A powerful, GUI-based tool for managing Windows Explorer right-click context men
 
 ## 📸 Screenshots
 
-> *Add screenshots of the GUI here before publishing.*
+<details>
+<summary><strong>🖥️ Main Dashboard</strong> — Browse entries with scope badges, search & filter</summary>
+<br>
+<img src="docs/screenshots/main-dashboard.png" alt="Main Dashboard" width="100%">
+</details>
+
+<details>
+<summary><strong>➕ Add New Entry</strong> — Pick executable, set label, choose target scopes</summary>
+<br>
+<img src="docs/screenshots/add-entry.png" alt="Add New Entry" width="100%">
+</details>
+
+<details open>
+<summary><strong>✏️ Edit Entry</strong> — Modify path, display name, icon & scopes</summary>
+<br>
+<img src="docs/screenshots/edit-entry.png" alt="Edit Entry" width="100%">
+</details>
+
+<details>
+<summary><strong>📂 Extension Picker</strong> — 80+ extensions across 8 categories + custom input</summary>
+<br>
+<img src="docs/screenshots/extension-picker.png" alt="Extension Picker" width="100%">
+</details>
+
+<details>
+<summary><strong>📋 Live Log Viewer</strong> — Real-time feed with backup management</summary>
+<br>
+<img src="docs/screenshots/log-viewer.png" alt="Log Viewer" width="100%">
+</details>
 
 ---
 
@@ -45,7 +73,7 @@ A powerful, GUI-based tool for managing Windows Explorer right-click context men
 ### Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Windows-Context-Menu-Creator.git
+git clone https://github.com/crrrowz/Windows-Context-Menu-Creator.git
 cd Windows-Context-Menu-Creator
 ```
 

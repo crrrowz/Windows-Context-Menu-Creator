@@ -8,7 +8,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/Windows-Context-Menu-Creator.git
+   git clone https://github.com/crrrowz/Windows-Context-Menu-Creator.git
    cd Windows-Context-Menu-Creator
    ```
 
