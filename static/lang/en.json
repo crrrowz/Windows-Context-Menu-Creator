@@ -1,0 +1,111 @@
+{
+    "lang": "en",
+    "dir": "ltr",
+    "app_title": "Context Menu Creator",
+    "menu": {
+        "file": "File",
+        "view": "View",
+        "about": "About",
+        "refresh": "Refresh Entries",
+        "new_entry": "New Entry",
+        "exit": "Exit",
+        "log": "Log",
+        "classic_menu": "Classic Menu",
+        "reveal_logs": "Reveal Log Folder",
+        "theme": "Theme",
+        "language": "Language",
+        "about_app": "About Context Menu Creator",
+        "github": "GitHub Repository"
+    },
+    "search": {
+        "placeholder": "Search entries…"
+    },
+    "filters": {
+        "all": "All",
+        "files": "Files *",
+        "dir": "Dir",
+        "dir_bg": "DirBG"
+    },
+    "entries": {
+        "loading": "Loading…",
+        "count": "{filtered} of {total} Entries",
+        "empty": "No entries match your filter.",
+        "edit": "Edit",
+        "remove": "Remove"
+    },
+    "scopes": {
+        "all_files": "All Files (*)",
+        "directory": "Directories",
+        "dir_background": "Dir Background",
+        "extension": "Extensions",
+        "short_all": "*",
+        "short_dir": "Dir",
+        "short_dirbg": "DirBG"
+    },
+    "modal": {
+        "add_title": "Add New Entry",
+        "edit_title": "Edit Entry",
+        "exe_path": "Executable Path",
+        "exe_placeholder": "C:\\Program Files\\App\\app.exe",
+        "key_name": "Registry Key Name",
+        "key_placeholder": "AppName (no spaces)",
+        "display_name": "Display Label",
+        "display_placeholder": "Open with App Name",
+        "icon_path": "Icon Path",
+        "icon_placeholder": "Auto-detected from exe",
+        "scopes": "Target Scopes",
+        "extensions": "File Extensions",
+        "ext_placeholder": "Custom: .xyz, .abc",
+        "ext_add": "Add",
+        "selected": "Selected",
+        "cancel": "Cancel",
+        "add_btn": "Add Entry",
+        "save_btn": "Save Changes"
+    },
+    "confirm": {
+        "title": "Confirm Removal",
+        "message": "Remove <strong>{name}</strong> from all scopes?<br>This cannot be undone.",
+        "cancel": "Cancel",
+        "remove": "Remove"
+    },
+    "log": {
+        "title": "Log",
+        "empty": "No logs loaded",
+        "live": "Live",
+        "clear": "Clear & backup"
+    },
+    "backup": {
+        "title": "Log Backups",
+        "loading": "Loading…",
+        "close": "Close",
+        "restore": "Restore",
+        "delete": "Delete"
+    },
+    "about": {
+        "version": "Version 1.0.0",
+        "desc": "Manage Windows Explorer right-click context menu entries.",
+        "built_with": "Built with Python + pywebview.",
+        "close": "Close"
+    },
+    "status": {
+        "not_admin": "(Not Admin)",
+        "enabled": "(Enabled)",
+        "disabled": "(Disabled)"
+    },
+    "toast": {
+        "classic_on": "Classic menu enabled — Explorer restarted",
+        "classic_off": "Modern menu restored — Explorer restarted",
+        "load_fail": "Failed to load entries",
+        "remove_ok": "Removed {name}",
+        "remove_fail": "Failed to remove",
+        "add_ok": "Entry added",
+        "edit_ok": "Entry updated",
+        "logs_cleared": "Log backed up & cleared",
+        "backup_restored": "Backup restored",
+        "backup_deleted": "Backup deleted"
+    },
+    "theme": {
+        "dark": "Dark",
+        "light": "Light"
+    }
+}

@@ -79,12 +79,26 @@ function syncExtUI() {
         countEl.textContent = selectedCount > 0 ? `${selectedCount}/${cat.exts.length}` : `${cat.exts.length}`;
     });
 
+    // Build removable chips in summary
     const summary = document.getElementById('extSummary');
     const arr = [...selectedExts].sort();
     if (arr.length === 0) {
-        summary.textContent = '';
+        summary.innerHTML = '';
     } else {
-        summary.textContent = `Selected: ${arr.join(', ')} (${arr.length})`;
+        const allCatExts = new Set(EXT_CATEGORIES.flatMap(c => c.exts));
+        const customExts = arr.filter(e => !allCatExts.has(e));
+        const categoryExts = arr.filter(e => allCatExts.has(e));
+
+        let html = `<div class="ext-summary-header">${t ? t('modal.selected') : 'Selected'}: ${arr.length}</div>`;
+        html += '<div class="ext-summary-chips">';
+        categoryExts.forEach(ext => {
+            html += `<span class="ext-summary-chip" data-ext="${ext}" onclick="removeExt(this)">${ext} <span class="ext-remove">×</span></span>`;
+        });
+        customExts.forEach(ext => {
+            html += `<span class="ext-summary-chip custom" data-ext="${ext}" onclick="removeExt(this)">${ext} <span class="ext-remove">×</span></span>`;
+        });
+        html += '</div>';
+        summary.innerHTML = html;
     }
 }
 
@@ -97,6 +111,12 @@ function addManualExts() {
         selectedExts.add(ext);
     });
     input.value = '';
+    syncExtUI();
+}
+
+function removeExt(chipEl) {
+    const ext = chipEl.dataset.ext;
+    selectedExts.delete(ext);
     syncExtUI();
 }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -11,80 +11,179 @@
 </head>
 
 <body>
+    <!-- Custom Titlebar (frameless window) -->
+    <div class="titlebar" id="titlebar">
+        <div class="titlebar-drag">
+            <div class="titlebar-icon">
+                <img src="icon.ico" alt="" width="16" height="16">
+            </div>
+            <nav class="titlebar-menu">
+                <div class="menu-item" id="menuFile">
+                    <span class="menu-label" data-i18n="menu.file">File</span>
+                    <div class="menu-dropdown">
+                        <button onclick="loadEntries()" data-i18n="menu.refresh" data-i18n-icon="refresh"><svg
+                                width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10" />
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                            </svg> Refresh Entries</button>
+                        <button onclick="openAddModal()" data-i18n="menu.new_entry" data-i18n-icon="plus"><svg
+                                width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg> New Entry</button>
+                        <div class="menu-divider"></div>
+                        <button onclick="pywebview.api.close()" data-i18n="menu.exit">Exit</button>
+                    </div>
+                </div>
+                <div class="menu-item" id="menuView">
+                    <span class="menu-label" data-i18n="menu.view">View</span>
+                    <div class="menu-dropdown">
+                        <button onclick="openLogModal()" data-i18n="menu.log">Log</button>
+                        <button onclick="toggleWin11()"><span data-i18n="menu.classic_menu">Classic Menu</span> <span
+                                id="classicMenuStatus" class="menu-status"></span></button>
+                        <button onclick="fetch('/api/open-log-folder')" data-i18n="menu.reveal_logs"
+                            data-i18n-icon="folder_open"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                                <path d="M2 10h20" />
+                            </svg> Reveal Log Folder</button>
+                        <div class="menu-divider"></div>
+                        <button onclick="toggleTheme()" data-action="toggle-theme"><svg width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="5" />
+                                <line x1="12" y1="1" x2="12" y2="3" />
+                                <line x1="12" y1="21" x2="12" y2="23" />
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                <line x1="1" y1="12" x2="3" y2="12" />
+                                <line x1="21" y1="12" x2="23" y2="12" />
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                            </svg> Light</button>
+                        <button onclick="toggleLanguage()" data-action="toggle-lang"><svg width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="2" y1="12" x2="22" y2="12" />
+                                <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                            </svg> العربية</button>
+                    </div>
+                </div>
+                <div class="menu-item" id="menuAbout">
+                    <span class="menu-label" data-i18n="menu.about">About</span>
+                    <div class="menu-dropdown">
+                        <button onclick="openAboutModal()" data-i18n="menu.about_app">About Context Menu
+                            Creator</button>
+                        <button onclick="window.open('https://github.com/crrrowz/Windows-Context-Menu-Creator')"
+                            data-i18n="menu.github">GitHub
+                            Repository</button>
+                    </div>
+                </div>
+            </nav>
+            <span class="titlebar-title" data-i18n="app_title">Context Menu Creator <span id="adminBadge"
+                    class="titlebar-admin"></span></span>
+        </div>
+        <div class="titlebar-controls">
+            <button class="titlebar-btn" onclick="pywebview.api.minimize()" title="Minimize">
+                <svg width="10" height="1" viewBox="0 0 10 1">
+                    <rect width="10" height="1" fill="currentColor" />
+                </svg>
+            </button>
+            <button class="titlebar-btn" onclick="pywebview.api.toggle_maximize()" title="Maximize">
+                <svg width="10" height="10" viewBox="0 0 10 10">
+                    <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" fill="none" stroke-width="1" />
+                </svg>
+            </button>
+            <button class="titlebar-btn titlebar-close" onclick="pywebview.api.close()" title="Close">
+                <svg width="10" height="10" viewBox="0 0 10 10">
+                    <line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" stroke-width="1.2" />
+                    <line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width="1.2" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <div class="app">
-        <!-- Header -->
-        <div class="header">
-            <h1>⚙ Context Menu Creator</h1>
-            <p>Manage Windows Explorer right-click menu entries</p>
-            <div class="header-badges">
-                <div id="adminBadge" class="badge warn">⏳ Checking…</div>
+
+        <!-- Search & Filters -->
+        <div class="control-bar">
+            <div class="search-box">
+                <span class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg></span>
+                <input type="text" id="searchInput" data-i18n="search.placeholder" data-i18n-attr="placeholder"
+                    placeholder="Search entries…" oninput="renderFiltered()">
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all" onclick="setFilter(this)"
+                    data-i18n="filters.all">All</button>
+                <button class="filter-tab" data-filter="all_files" onclick="setFilter(this)"
+                    data-i18n="filters.files">Files *</button>
+                <button class="filter-tab" data-filter="directory" onclick="setFilter(this)"
+                    data-i18n="filters.dir">Dir</button>
+                <button class="filter-tab" data-filter="dir_background" onclick="setFilter(this)"
+                    data-i18n="filters.dir_bg">DirBG</button>
             </div>
         </div>
 
-        <!-- Win11 Toggle -->
-        <div class="win11-bar">
-            <div class="info">
-                <strong>Windows 11 Classic Menu</strong>
-                <span>Force full context menu on right-click (no "Show more options")</span>
-            </div>
-            <button id="win11Toggle" class="toggle-switch" onclick="toggleWin11()"></button>
+        <!-- Entry Count -->
+        <div class="toolbar">
+            <h2 id="entryCount" data-i18n="entries.loading">Loading…</h2>
         </div>
 
-        <!-- Two-column layout -->
-        <div class="app-layout">
-            <!-- Left: Main Content -->
-            <div class="main-col">
-                <!-- Search & Filters -->
-                <div class="control-bar">
-                    <div class="search-box">
-                        <span class="icon">🔍</span>
-                        <input type="text" id="searchInput" placeholder="Search entries…" oninput="renderFiltered()">
-                    </div>
-                    <div class="filter-tabs">
-                        <button class="filter-tab active" data-filter="all" onclick="setFilter(this)">All</button>
-                        <button class="filter-tab" data-filter="all_files" onclick="setFilter(this)">Files *</button>
-                        <button class="filter-tab" data-filter="directory" onclick="setFilter(this)">Dir</button>
-                        <button class="filter-tab" data-filter="dir_background" onclick="setFilter(this)">DirBG</button>
-                    </div>
-                </div>
+        <!-- Entries -->
+        <div id="entriesContainer">
+            <div class="entries-list">
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+        </div>
 
-                <!-- Toolbar -->
-                <div class="toolbar">
-                    <h2 id="entryCount">Loading…</h2>
-                    <div class="toolbar-actions">
-                        <button class="btn btn-ghost btn-sm" onclick="loadEntries()">↻ Refresh</button>
-                        <button class="btn btn-primary" onclick="openAddModal()">+ Add Entry</button>
-                    </div>
-                </div>
+    </div>
 
-                <!-- Entries -->
-                <div id="entriesContainer">
-                    <div class="entries-list">
-                        <div class="skeleton"></div>
-                        <div class="skeleton"></div>
-                        <div class="skeleton"></div>
-                    </div>
+    <!-- Log Modal -->
+    <div id="logModal" class="modal-overlay" onclick="if(event.target===this)closeLogModal()">
+        <div class="modal log-modal">
+            <div class="log-sidebar-header">
+                <h3><span class="live-dot"></span> <span data-i18n="log.title">Log</span> <span id="logTotal"
+                        style="font-weight:400;color:var(--text-muted);font-size:0.6rem"></span></h3>
+                <div class="log-actions">
+                    <button class="btn btn-ghost btn-sm" onclick="openBackupBrowser()" id="backupsBtn"
+                        title="View backups" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <polyline points="21 8 21 21 3 21 3 8" />
+                            <rect x="1" y="3" width="22" height="5" />
+                            <line x1="10" y1="12" x2="14" y2="12" />
+                        </svg></button>
+                    <button class="btn btn-danger btn-sm" onclick="clearLogs()" data-i18n="log.clear"
+                        data-i18n-attr="title" title="Clear & backup"><svg width="13" height="13" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg></button>
+                    <button class="btn btn-ghost btn-sm" onclick="closeLogModal()"><svg width="10" height="10"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg></button>
                 </div>
             </div>
-
-            <!-- Right: Log Sidebar -->
-            <div class="log-sidebar" id="logPanel">
-                <div class="log-sidebar-header">
-                    <h3><span class="live-dot"></span> Log <span id="logTotal"
-                            style="font-weight:400;color:var(--text-muted);font-size:0.6rem"></span></h3>
-                    <div class="log-actions">
-                        <button class="btn btn-ghost btn-sm" onclick="openBackupBrowser()" id="backupsBtn"
-                            title="View backups" style="display:none">📦</button>
-                        <button class="btn btn-danger btn-sm" onclick="clearLogs()" title="Clear & backup">🗑</button>
-                    </div>
-                </div>
-                <div class="log-sidebar-body" id="logLines">
-                    <div class="empty">No logs loaded</div>
-                </div>
-                <div class="log-sidebar-footer">
-                    <span id="logInfo">Live</span>
-                    <span id="logBackupInfo"></span>
-                </div>
+            <div class="log-sidebar-body" id="logLines">
+                <div class="empty" data-i18n="log.empty">No logs loaded</div>
+            </div>
+            <div class="log-sidebar-footer">
+                <span id="logInfo" data-i18n="log.live">Live</span>
+                <span id="logBackupInfo"></span>
             </div>
         </div>
     </div>
@@ -95,57 +194,70 @@
     <!-- Add/Edit Modal -->
     <div id="entryModal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
         <div class="modal">
-            <h3 id="modalTitle">Add New Entry</h3>
-            <input type="hidden" id="editingKey" value="">
+            <h3 id="modalTitle" data-i18n="modal.add_title">Add New Entry</h3>
+            <div class="modal-body">
+                <input type="hidden" id="editingKey" value="">
 
-            <div class="form-group">
-                <label>Executable Path</label>
-                <div class="input-row">
-                    <input type="text" id="exePath" placeholder="C:\Program Files\App\app.exe">
-                    <button class="btn btn-ghost btn-sm" onclick="pickFile()">📂</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Registry Key Name</label>
-                <input type="text" id="keyName" placeholder="AppName (no spaces)">
-            </div>
-            <div class="form-group">
-                <label>Display Label</label>
-                <input type="text" id="displayName" placeholder="Open with App Name">
-            </div>
-            <div class="form-group">
-                <label>Icon Path</label>
-                <input type="text" id="iconPath" placeholder="Auto-detected from exe">
-            </div>
-            <div class="form-group">
-                <label>Target Scopes</label>
-                <div class="scope-checkboxes">
-                    <div class="scope-option" data-scope="all_files" onclick="toggleScope(this)">
-                        <div class="check"></div><span>All Files (*)</span>
-                    </div>
-                    <div class="scope-option" data-scope="directory" onclick="toggleScope(this)">
-                        <div class="check"></div><span>Directories</span>
-                    </div>
-                    <div class="scope-option" data-scope="dir_background" onclick="toggleScope(this)">
-                        <div class="check"></div><span>Dir Background</span>
-                    </div>
-                    <div class="scope-option" data-scope="extension" onclick="toggleScope(this)">
-                        <div class="check"></div><span>Extensions</span>
+                <div class="form-group">
+                    <label data-i18n="modal.exe_path">Executable Path</label>
+                    <div class="input-row">
+                        <input type="text" id="exePath" data-i18n="modal.exe_placeholder" data-i18n-attr="placeholder"
+                            placeholder="C:\Program Files\App\app.exe">
+                        <button class="btn btn-ghost btn-sm" onclick="pickFile()"><svg width="14" height="14"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg></button>
                     </div>
                 </div>
-            </div>
-            <div class="form-group" id="extensionsGroup" style="display:none;">
-                <label>File Extensions</label>
-                <div class="ext-picker" id="extPicker"></div>
-                <div class="ext-manual">
-                    <input type="text" id="extManualInput" placeholder="Custom: .xyz, .abc">
-                    <button class="btn btn-ghost btn-sm" onclick="addManualExts()">+ Add</button>
+                <div class="form-group">
+                    <label data-i18n="modal.key_name">Registry Key Name</label>
+                    <input type="text" id="keyName" data-i18n="modal.key_placeholder" data-i18n-attr="placeholder"
+                        placeholder="AppName (no spaces)">
                 </div>
-                <div class="ext-selected-summary" id="extSummary"></div>
+                <div class="form-group">
+                    <label data-i18n="modal.display_name">Display Label</label>
+                    <input type="text" id="displayName" data-i18n="modal.display_placeholder"
+                        data-i18n-attr="placeholder" placeholder="Open with App Name">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="modal.icon_path">Icon Path</label>
+                    <input type="text" id="iconPath" data-i18n="modal.icon_placeholder" data-i18n-attr="placeholder"
+                        placeholder="Auto-detected from exe">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="modal.scopes">Target Scopes</label>
+                    <div class="scope-checkboxes">
+                        <div class="scope-option" data-scope="all_files" onclick="toggleScope(this)">
+                            <div class="check"></div><span data-i18n="scopes.all_files">All Files (*)</span>
+                        </div>
+                        <div class="scope-option" data-scope="directory" onclick="toggleScope(this)">
+                            <div class="check"></div><span data-i18n="scopes.directory">Directories</span>
+                        </div>
+                        <div class="scope-option" data-scope="dir_background" onclick="toggleScope(this)">
+                            <div class="check"></div><span data-i18n="scopes.dir_background">Dir Background</span>
+                        </div>
+                        <div class="scope-option" data-scope="extension" onclick="toggleScope(this)">
+                            <div class="check"></div><span data-i18n="scopes.extension">Extensions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="extensionsGroup" style="display:none;">
+                    <label data-i18n="modal.extensions">File Extensions</label>
+                    <div class="ext-picker" id="extPicker"></div>
+                    <div class="ext-manual">
+                        <input type="text" id="extManualInput" data-i18n="modal.ext_placeholder"
+                            data-i18n-attr="placeholder" placeholder="Custom: .xyz, .abc">
+                        <button class="btn btn-ghost btn-sm" onclick="addManualExts()" data-i18n="modal.ext_add">+
+                            Add</button>
+                    </div>
+                    <div class="ext-selected-summary" id="extSummary"></div>
+                </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" id="modalSubmit" onclick="submitEntry()">Add Entry</button>
+                <button class="btn btn-ghost" onclick="closeModal()" data-i18n="modal.cancel">Cancel</button>
+                <button class="btn btn-primary" id="modalSubmit" onclick="submitEntry()" data-i18n="modal.add_btn">Add
+                    Entry</button>
             </div>
         </div>
     </div>
@@ -153,12 +265,15 @@
     <!-- Confirm Delete -->
     <div id="confirmModal" class="modal-overlay" onclick="if(event.target===this)closeConfirm()">
         <div class="modal" style="max-width:400px">
-            <h3>Confirm Removal</h3>
-            <div class="confirm-body">Remove <strong id="confirmName"></strong> from all scopes?<br>This cannot be
-                undone.</div>
+            <h3 data-i18n="confirm.title">Confirm Removal</h3>
+            <div class="modal-body">
+                <div class="confirm-body"><span data-i18n="confirm.message">Remove <strong id="confirmName"></strong>
+                        from all scopes?<br>This cannot be
+                        undone.</span></div>
+            </div>
             <div class="modal-actions">
-                <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
-                <button class="btn btn-danger" onclick="confirmRemove()">Remove</button>
+                <button class="btn btn-ghost" onclick="closeConfirm()" data-i18n="confirm.cancel">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmRemove()" data-i18n="confirm.remove">Remove</button>
             </div>
         </div>
     </div>
@@ -166,21 +281,47 @@
     <!-- Backup Browser Modal -->
     <div id="backupModal" class="modal-overlay" onclick="if(event.target===this)closeBackupBrowser()">
         <div class="modal" style="max-width:500px">
-            <h3>📦 Log Backups</h3>
+            <h3 data-i18n="backup.title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="21 8 21 21 3 21 3 8" />
+                    <rect x="1" y="3" width="22" height="5" />
+                    <line x1="10" y1="12" x2="14" y2="12" />
+                </svg> Log Backups</h3>
             <div class="backup-list" id="backupList">
-                <div class="backup-empty">Loading…</div>
+                <div class="backup-empty" data-i18n="backup.loading">Loading…</div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-ghost" onclick="closeBackupBrowser()">Close</button>
+                <button class="btn btn-ghost" onclick="closeBackupBrowser()" data-i18n="backup.close">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- JS Modules (order matters: utils first, then features) -->
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal-overlay" onclick="if(event.target===this)closeAbout()">
+        <div class="modal" style="max-width:420px;text-align:center">
+            <div style="margin-bottom:1rem;">
+                <img src="icon.ico" alt="" width="48" height="48" style="border-radius:8px">
+            </div>
+            <h3 style="border:none;padding:0;margin-bottom:0.5rem" data-i18n="app_title">Context Menu Creator</h3>
+            <p style="color:var(--text-muted);font-size:0.78rem;margin-bottom:0.5rem" data-i18n="about.version">Version
+                1.0.0</p>
+            <p style="color:var(--text-secondary);font-size:0.78rem;line-height:1.6;margin-bottom:1rem">
+                <span data-i18n="about.desc">Manage Windows Explorer right-click context menu entries.</span><br>
+                <span data-i18n="about.built_with">Built with Python + pywebview.</span>
+            </p>
+            <div class="modal-actions" style="justify-content:center">
+                <button class="btn btn-ghost" onclick="closeAbout()" data-i18n="about.close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Modules (order matters: i18n first, then utils, then features) -->
+    <script src="js/i18n.js"></script>
     <script src="js/app.js"></script>
     <script src="js/extensions.js"></script>
     <script src="js/modal.js"></script>
     <script src="js/logs.js"></script>
+    <script src="js/menubar.js"></script>
 </body>
 
 </html>

@@ -5,10 +5,12 @@ scoped to their module name.
 """
 
 import logging
+import os
 import sys
 from pathlib import Path
 
-_LOG_DIR = Path(__file__).parent / "logs"
+# Logs always go to a fixed, user-accessible location.
+_LOG_DIR = Path(os.environ.get("TEMP", r"C:\temp")) / "ContextMenuCreator" / "logs"
 _LOG_FILE = _LOG_DIR / "context_menu.log"
 _INITIALIZED = False
 
@@ -19,7 +21,7 @@ def _init_root_logger() -> None:
     if _INITIALIZED:
         return
 
-    _LOG_DIR.mkdir(exist_ok=True)
+    _LOG_DIR.mkdir(parents=True, exist_ok=True)
 
     root = logging.getLogger("ctxmenu")
     root.setLevel(logging.DEBUG)

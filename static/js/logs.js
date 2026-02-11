@@ -28,10 +28,10 @@ async function loadLogs() {
         const backupInfo = document.getElementById('logBackupInfo');
 
         totalEl.textContent = `(${d.total})`;
-        infoEl.textContent = d.total > 0 ? `Last ${d.lines.length} of ${d.total}` : 'Live';
+        infoEl.textContent = d.total > 0 ? `Last ${d.lines.length} of ${d.total}` : t('log.live');
 
         if (d.lines.length === 0) {
-            container.innerHTML = '<div class="empty">No log entries</div>';
+            container.innerHTML = `<div class="empty">${t('log.empty')}</div>`;
         } else {
             container.innerHTML = d.lines.map(l => `<div class="log-line">${esc(l)}</div>`).join('');
             container.scrollTop = container.scrollHeight;
@@ -46,7 +46,7 @@ async function clearLogs() {
     try {
         const res = await fetch('/api/logs/clear', { method: 'POST' });
         const d = await res.json();
-        if (d.success) { toast('Logs cleared (backup saved)', 'success'); _lastLogHash = ''; loadLogs(); }
+        if (d.success) { toast(t('toast.logs_cleared'), 'success'); _lastLogHash = ''; loadLogs(); }
         else toast(d.error || 'Failed', 'error');
     } catch (e) { toast('Clear failed', 'error'); }
 }
@@ -66,18 +66,18 @@ async function loadBackups() {
         const res = await fetch('/api/logs/backups');
         const backups = await res.json();
         if (backups.length === 0) {
-            list.innerHTML = '<div class="backup-empty">No backups found</div>';
+            list.innerHTML = `<div class="backup-empty">${t('log.empty')}</div>`;
             return;
         }
         list.innerHTML = backups.map(b => `
             <div class="backup-item" data-file="${esc(b.filename)}">
                 <div class="backup-meta">
-                    <span class="backup-date">📄 ${esc(b.created)}</span>
+                    <span class="backup-date">${icon('folder')} ${esc(b.created)}</span>
                     <span class="backup-info">${b.lines} lines · ${(b.size / 1024).toFixed(1)} KB</span>
                 </div>
                 <div class="backup-actions">
-                    <button class="btn btn-ghost btn-sm" onclick="restoreBackup('${esc(b.filename)}')" title="Restore">⏪ Restore</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteBackup('${esc(b.filename)}')" title="Delete permanently">✕</button>
+                    <button class="btn btn-ghost btn-sm" onclick="restoreBackup('${esc(b.filename)}')" title="${t('backup.restore')}">${icon('refresh')} ${t('backup.restore')}</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteBackup('${esc(b.filename)}')" title="${t('backup.delete')}">${icon('x')}</button>
                 </div>
             </div>
         `).join('');
@@ -93,7 +93,7 @@ async function restoreBackup(filename) {
         });
         const d = await res.json();
         if (d.success) {
-            toast('Backup restored', 'success');
+            toast(t('toast.backup_restored'), 'success');
             _lastLogHash = '';
             loadLogs();
             loadBackups();
@@ -106,7 +106,7 @@ async function deleteBackup(filename) {
         const res = await fetch(`/api/logs/backups/${encodeURIComponent(filename)}`, { method: 'DELETE' });
         const d = await res.json();
         if (d.success) {
-            toast('Backup deleted', 'success');
+            toast(t('toast.backup_deleted'), 'success');
             loadBackups();
             _lastLogHash = '';
             loadLogs();

@@ -4,8 +4,8 @@
 
 /* ── Add Modal ───────────────────────────────────────────── */
 function openAddModal() {
-    document.getElementById('modalTitle').textContent = 'Add New Entry';
-    document.getElementById('modalSubmit').textContent = 'Add Entry';
+    document.getElementById('modalTitle').textContent = t('modal.add_title');
+    document.getElementById('modalSubmit').textContent = t('modal.add_btn');
     document.getElementById('editingKey').value = '';
     document.getElementById('exePath').value = '';
     document.getElementById('keyName').value = ''; document.getElementById('keyName').readOnly = false;
@@ -22,8 +22,8 @@ async function openEditModal(keyName) {
     try {
         const res = await fetch(`/api/entry/${encodeURIComponent(keyName)}`);
         const data = await res.json();
-        document.getElementById('modalTitle').textContent = `Edit: ${data.display_name || keyName}`;
-        document.getElementById('modalSubmit').textContent = 'Save Changes';
+        document.getElementById('modalTitle').textContent = `${t('modal.edit_title')}: ${data.display_name || keyName}`;
+        document.getElementById('modalSubmit').textContent = t('modal.save_btn');
         document.getElementById('editingKey').value = keyName;
 
         let exe = '';
@@ -91,7 +91,7 @@ async function submitEntry() {
         const method = editingKey ? 'PUT' : 'POST';
         const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         const d = await res.json();
-        if (d.error) { toast(d.error, 'error'); } else { toast(editingKey ? 'Entry updated!' : 'Entry added!', 'success'); closeModal(); loadEntries(); }
+        if (d.error) { toast(d.error, 'error'); } else { toast(editingKey ? t('toast.edit_ok') : t('toast.add_ok'), 'success'); closeModal(); loadEntries(); }
     } catch (e) { toast('Operation failed', 'error'); }
 }
 
@@ -103,7 +103,7 @@ async function confirmRemove() {
     try {
         const res = await fetch(`/api/entries/${encodeURIComponent(deleteTarget)}`, { method: 'DELETE' });
         const d = await res.json();
-        if (d.error) toast(d.error, 'error'); else { toast(`'${deleteTarget}' removed.`, 'success'); loadEntries(); }
-    } catch (e) { toast('Remove failed', 'error'); }
+        if (d.error) toast(d.error, 'error'); else { toast(t('toast.remove_ok', { name: deleteTarget }), 'success'); loadEntries(); }
+    } catch (e) { toast(t('toast.remove_fail'), 'error'); }
     closeConfirm();
 }

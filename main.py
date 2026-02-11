@@ -410,6 +410,9 @@ def main() -> None:
 
 if __name__ == "__main__":
     if "--gui" in sys.argv:
+        from gui import launch
+        launch()
+    elif "--browser" in sys.argv:
         from server import start_gui
         start_gui()
     else:

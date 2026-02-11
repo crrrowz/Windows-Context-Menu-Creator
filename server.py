@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import threading
 import webbrowser
 from datetime import datetime
@@ -29,9 +30,18 @@ from logger_setup import get_logger
 
 log = get_logger("server")
 
-_STATIC_DIR = Path(__file__).parent / "static"
-_LOG_FILE = Path(__file__).parent / "logs" / "context_menu.log"
-_LOG_BACKUP_DIR = Path(__file__).parent / "logs" / "backups"
+# ── PyInstaller / Nuitka compatible base path ──────────────────
+if getattr(sys, 'frozen', False):
+    _BASE_DIR = Path(sys._MEIPASS)  # PyInstaller temp folder (static assets)
+else:
+    _BASE_DIR = Path(__file__).parent
+
+# Logs/crash in a fixed user-accessible location
+_APP_DIR = Path(os.environ.get("TEMP", r"C:\temp")) / "ContextMenuCreator"
+
+_STATIC_DIR = _BASE_DIR / "static"
+_LOG_FILE = _APP_DIR / "logs" / "context_menu.log"
+_LOG_BACKUP_DIR = _APP_DIR / "logs" / "backups"
 _PORT = 8787
 
 # Scope string ↔ enum mapping
@@ -84,6 +94,11 @@ class APIHandler(SimpleHTTPRequestHandler):
             self._handle_get_logs()
         elif path == "/api/logs/backups":
             self._handle_list_backups()
+        elif path == "/api/open-log-folder":
+            log_dir = str(_APP_DIR / "logs")
+            os.makedirs(log_dir, exist_ok=True)
+            os.startfile(log_dir)
+            self._json_response({"ok": True, "path": log_dir})
         else:
             super().do_GET()
 
@@ -409,8 +424,39 @@ class APIHandler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
 
-def start_gui():
-    """Start the web server and open the browser."""
+# ── Server launchers ───────────────────────────────────────────
+
+_server_instance: HTTPServer | None = None
+
+
+def start_server() -> None:
+    """Start the HTTP server (headless — no browser, no webview).
+
+    Used by gui.py to run the API in a background thread.
+    Blocks until server_close() is called or the process exits.
+    """
+    global _server_instance
+    APIHandler.manager = RegistryManager(dry_run=False)
+
+    _server_instance = HTTPServer(("127.0.0.1", _PORT), APIHandler)
+    url = f"http://127.0.0.1:{_PORT}"
+    log.info("Server running at %s", url)
+    print(f"\n  [OK] Server listening on {url}")
+
+    _server_instance.serve_forever()
+
+
+def stop_server() -> None:
+    """Gracefully shut down the running HTTP server."""
+    global _server_instance
+    if _server_instance:
+        _server_instance.shutdown()
+        _server_instance.server_close()
+        _server_instance = None
+
+
+def start_gui() -> None:
+    """Legacy launcher — start server + open default browser."""
     if not is_admin():
         print("  ⚠  Not running as Administrator — add/remove/edit will fail.")
         print("     Right-click your terminal → 'Run as administrator'.\n")

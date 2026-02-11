@@ -16,9 +16,10 @@ function toast(msg, type = 'success') {
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
 /* ── Init ────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-    checkStatus();
-    loadEntries();
+document.addEventListener('DOMContentLoaded', async () => {
+    await initI18n();
+    await checkStatus();
+    await loadEntries();
     buildExtPicker();
     startLogPolling();
 });
@@ -29,12 +30,23 @@ async function checkStatus() {
         const res = await fetch('/api/status');
         const d = await res.json();
         const badge = document.getElementById('adminBadge');
-        badge.className = d.admin ? 'badge ok' : 'badge warn';
-        badge.textContent = d.admin ? '🛡 Administrator' : '⚠ Not Admin';
+        if (d.admin) {
+            badge.textContent = '';
+            badge.style.display = 'none';
+        } else {
+            badge.textContent = t('status.not_admin');
+            badge.style.display = 'inline';
+        }
 
         const toggle = document.getElementById('win11Toggle');
-        if (d.classic_menu) toggle.classList.add('on');
-        else toggle.classList.remove('on');
+        const menuStatus = document.getElementById('classicMenuStatus');
+        if (d.classic_menu) {
+            if (toggle) toggle.classList.add('on');
+            if (menuStatus) { menuStatus.textContent = t('status.enabled'); menuStatus.className = 'menu-status enabled'; }
+        } else {
+            if (toggle) toggle.classList.remove('on');
+            if (menuStatus) { menuStatus.textContent = t('status.disabled'); menuStatus.className = 'menu-status disabled'; }
+        }
     } catch (e) { }
 }
 
@@ -49,8 +61,16 @@ async function toggleWin11() {
         const d = await res.json();
         if (d.error) { toast(d.error, 'error'); return; }
         const toggle = document.getElementById('win11Toggle');
-        if (d.classic_menu) { toggle.classList.add('on'); toast('Classic menu enabled — Explorer restarted', 'success'); }
-        else { toggle.classList.remove('on'); toast('Modern menu restored — Explorer restarted', 'success'); }
+        const menuStatus = document.getElementById('classicMenuStatus');
+        if (d.classic_menu) {
+            if (toggle) toggle.classList.add('on');
+            toast(t('toast.classic_on'), 'success');
+            if (menuStatus) { menuStatus.textContent = t('status.enabled'); menuStatus.className = 'menu-status enabled'; }
+        } else {
+            if (toggle) toggle.classList.remove('on');
+            toast(t('toast.classic_off'), 'success');
+            if (menuStatus) { menuStatus.textContent = t('status.disabled'); menuStatus.className = 'menu-status disabled'; }
+        }
     } catch (e) { toast('Failed: ' + e.message, 'error'); }
 }
 
@@ -60,7 +80,7 @@ async function loadEntries() {
         const res = await fetch('/api/entries');
         entries = await res.json();
         renderFiltered();
-    } catch (e) { toast('Failed to load entries', 'error'); }
+    } catch (e) { toast(t('toast.load_fail'), 'error'); }
 }
 
 /* ── Filter & Search ─────────────────────────────────────── */
@@ -89,18 +109,18 @@ function renderFiltered() {
 
 /* ── Render ───────────────────────────────────────────────── */
 const SCOPE_META = {
-    all_files: { label: 'All Files (*)', short: '*', dot: 'all_files' },
-    directory: { label: 'Directories', short: 'Dir', dot: 'directory' },
-    dir_background: { label: 'Dir Background', short: 'DirBG', dot: 'dir_background' },
+    all_files: { label: () => t('scopes.all_files'), short: () => t('scopes.short_all'), dot: 'all_files' },
+    directory: { label: () => t('scopes.directory'), short: () => t('scopes.short_dir'), dot: 'directory' },
+    dir_background: { label: () => t('scopes.dir_background'), short: () => t('scopes.short_dirbg'), dot: 'dir_background' },
 };
 
 function render(list) {
     const container = document.getElementById('entriesContainer');
     const countEl = document.getElementById('entryCount');
-    countEl.textContent = `${list.length} of ${entries.length} Entries`;
+    countEl.textContent = t('entries.count', { filtered: list.length, total: entries.length });
 
     if (list.length === 0) {
-        container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>No entries match your filter.</p></div>`;
+        container.innerHTML = `<div class="empty-state"><div class="icon">${icon('clipboard')}</div><p>${t('entries.empty')}</p></div>`;
         return;
     }
 
@@ -118,13 +138,14 @@ function render(list) {
 
     let html = '';
     for (const [scope, items] of Object.entries(groups)) {
-        const meta = SCOPE_META[scope] || { label: scope, short: scope, dot: scope };
+        const meta = SCOPE_META[scope] || { label: () => scope, short: () => scope, dot: scope };
         html += `
-                <div class="scope-group">
-                    <div class="scope-group-header">
+                <div class="scope-group collapsed" id="sg-${scope}">
+                    <div class="scope-group-header" onclick="toggleScopeGroup('sg-${scope}')">
                         <div class="dot ${meta.dot}"></div>
-                        <h3>${meta.label}</h3>
+                        <h3>${meta.label()}</h3>
                         <span class="count">${items.length}</span>
+                        <span class="collapse-arrow">${icon('chevron_down')}</span>
                     </div>
                     <div class="entries-list">${items.map(cardHTML).join('')}</div>
                 </div>`;
@@ -132,10 +153,20 @@ function render(list) {
     container.innerHTML = html;
 }
 
+function toggleScopeGroup(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const wasCollapsed = el.classList.contains('collapsed');
+    // Close all groups first (accordion)
+    document.querySelectorAll('.scope-group').forEach(g => g.classList.add('collapsed'));
+    // Open clicked one if it was closed
+    if (wasCollapsed) el.classList.remove('collapsed');
+}
+
 function cardHTML(e) {
     const scopeBadges = e.scopes.map(s => {
-        const m = SCOPE_META[s] || { short: s, dot: s };
-        return `<span class="scope-badge ${m.dot}">${m.short}</span>`;
+        const m = SCOPE_META[s] || { short: () => s, dot: s };
+        return `<span class="scope-badge ${m.dot}">${m.short()}</span>`;
     }).join('');
 
     return `
@@ -146,8 +177,8 @@ function cardHTML(e) {
                     <div class="entry-scopes">${scopeBadges}</div>
                 </div>
                 <div class="entry-actions">
-                    <button class="btn btn-ghost btn-sm" onclick="openEditModal('${esc(e.key_name)}')">✏ Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="openConfirm('${esc(e.key_name)}')">✕</button>
+                    <button class="btn btn-ghost btn-sm" onclick="openEditModal('${esc(e.key_name)}')">${icon('edit')} ${t('entries.edit')}</button>
+                    <button class="btn btn-danger btn-sm" onclick="openConfirm('${esc(e.key_name)}')">${icon('x')}</button>
                 </div>
             </div>`;
 }

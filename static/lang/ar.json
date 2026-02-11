@@ -1,0 +1,111 @@
+{
+    "lang": "ar",
+    "dir": "rtl",
+    "app_title": "أداة قوائم السياق",
+    "menu": {
+        "file": "ملف",
+        "view": "عرض",
+        "about": "حول",
+        "refresh": "تحديث العناصر",
+        "new_entry": "إدخال جديد",
+        "exit": "خروج",
+        "log": "السجلات",
+        "classic_menu": "القائمة الكلاسيكية",
+        "reveal_logs": "فتح مجلد السجلات",
+        "theme": "المظهر",
+        "language": "اللغة",
+        "about_app": "حول أداة قوائم السياق",
+        "github": "مستودع GitHub"
+    },
+    "search": {
+        "placeholder": "البحث في العناصر…"
+    },
+    "filters": {
+        "all": "الكل",
+        "files": "ملفات *",
+        "dir": "مجلد",
+        "dir_bg": "خلفية"
+    },
+    "entries": {
+        "loading": "جارٍ التحميل…",
+        "count": "{filtered} من {total} عنصر",
+        "empty": "لا توجد عناصر مطابقة.",
+        "edit": "تعديل",
+        "remove": "حذف"
+    },
+    "scopes": {
+        "all_files": "جميع الملفات (*)",
+        "directory": "المجلدات",
+        "dir_background": "خلفية المجلد",
+        "extension": "الامتدادات",
+        "short_all": "*",
+        "short_dir": "مجلد",
+        "short_dirbg": "خلفية"
+    },
+    "modal": {
+        "add_title": "إضافة عنصر جديد",
+        "edit_title": "تعديل العنصر",
+        "exe_path": "مسار الملف التنفيذي",
+        "exe_placeholder": "C:\\Program Files\\App\\app.exe",
+        "key_name": "اسم مفتاح السجل",
+        "key_placeholder": "AppName (بدون مسافات)",
+        "display_name": "اسم العرض",
+        "display_placeholder": "فتح بواسطة التطبيق",
+        "icon_path": "مسار الأيقونة",
+        "icon_placeholder": "يُكتشف تلقائياً من الملف التنفيذي",
+        "scopes": "نطاقات الهدف",
+        "extensions": "امتدادات الملفات",
+        "ext_placeholder": "مخصص: .xyz, .abc",
+        "ext_add": "إضافة",
+        "selected": "المحدد",
+        "cancel": "إلغاء",
+        "add_btn": "إضافة عنصر",
+        "save_btn": "حفظ التغييرات"
+    },
+    "confirm": {
+        "title": "تأكيد الحذف",
+        "message": "إزالة <strong>{name}</strong> من جميع النطاقات؟<br>لا يمكن التراجع عن هذا.",
+        "cancel": "إلغاء",
+        "remove": "حذف"
+    },
+    "log": {
+        "title": "السجل",
+        "empty": "لم يتم تحميل السجلات",
+        "live": "مباشر",
+        "clear": "مسح ونسخ احتياطي"
+    },
+    "backup": {
+        "title": "النسخ الاحتياطية",
+        "loading": "جارٍ التحميل…",
+        "close": "إغلاق",
+        "restore": "استعادة",
+        "delete": "حذف"
+    },
+    "about": {
+        "version": "الإصدار 1.0.0",
+        "desc": "إدارة عناصر قائمة السياق في مستكشف ويندوز.",
+        "built_with": "بُني بواسطة Python + pywebview.",
+        "close": "إغلاق"
+    },
+    "status": {
+        "not_admin": "(بدون صلاحيات)",
+        "enabled": "(مفعّل)",
+        "disabled": "(معطّل)"
+    },
+    "toast": {
+        "classic_on": "تم تفعيل القائمة الكلاسيكية — أُعيد تشغيل المستكشف",
+        "classic_off": "تم استعادة القائمة الحديثة — أُعيد تشغيل المستكشف",
+        "load_fail": "فشل تحميل العناصر",
+        "remove_ok": "تمت إزالة {name}",
+        "remove_fail": "فشلت الإزالة",
+        "add_ok": "تمت إضافة العنصر",
+        "edit_ok": "تم تحديث العنصر",
+        "logs_cleared": "تم حفظ نسخة احتياطية ومسح السجل",
+        "backup_restored": "تمت استعادة النسخة الاحتياطية",
+        "backup_deleted": "تم حذف النسخة الاحتياطية"
+    },
+    "theme": {
+        "dark": "داكن",
+        "light": "فاتح"
+    }
+}
